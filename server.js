@@ -19,6 +19,7 @@
 
 var express = require('express');
 var app = express();
+var router = express.Router();
 
 app.get('/', function (req, res) {
     res.send('Hello World!');
@@ -34,6 +35,42 @@ app.get('/text', function (req, res) {
     res.send(text);
 });
 
+router.route('/titles')
+    .post(function(req, res) {
+        // TODO: get all titles from the lib
+        var text = [];
+        var lib = getLibrary();
+        if (lib && lib.length > 0) {
+            for (var item in lib) {
+                text.push(lib[item].title);
+            }
+        }
+        res.json({ titles: text });
+    });
+
+router.route('/title/:item_title')
+    .get(function(req, res) {
+        var lib = getLibrary();
+        var item = { message: 'title not found' };
+        console.log(req.params);
+        console.log(req.params.item_title);
+        // console.log(req.body);
+        // console.log('title: ', req.body.title);
+        // console.log('request: ', req);
+        for (var i in lib) {
+            console.log(lib[i].title, req.params.item_title);
+            if (lib[i].title.toLowerCase() === req.params.item_title.toLowerCase()) {
+                item = lib[i];
+                break;
+            }
+        }
+        res.json(item);
+    });
+
+
+app.use('/api', router);
+
+
 var server = app.listen(3000, function () {
     var host = server.address().address;
     var port = server.address().port;
@@ -46,6 +83,24 @@ var server = app.listen(3000, function () {
 var getLibrary = function() {
 
     var lib = [];
+
+var tzara = {
+        "title": "To Make a Dadaist Poem",
+        "author": "Tristan Tzara",
+        "tags": ["poetry", "dada"],
+        "copyright": null,
+        "source": null,
+        "text": `Take a newspaper.
+Take some scissors.
+Choose from this paper an article of the length you want to make your poem.
+Cut out the article.
+Next carefully cut out each of the words that makes up this article and put them all in a bag.
+Shake gently.
+Next take out each cutting one after the other.
+Copy conscientiously in the order in which they left the bag.
+The poem will resemble you.
+And there you are - an infinitely original author of charming sensibility, even though unappreciated by the vulgar herd.`
+};
 
     var item = {
         "title": "Howl",
@@ -434,6 +489,7 @@ journey on the highway across America in tears
 to the door of my cottage in the Western night`
     };
 
+    lib.push(tzara);
     lib.push(item);
     return lib;
 
